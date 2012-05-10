@@ -10,7 +10,7 @@ Gazzang welcomes contributions to its cookbooks and welcomes suggestions for new
 
 For information on how to contribute, see the CONTRIBUTING file in this repository.
 
-Opscode cookbooks are distributed under the Apache 2 Software License. See LICENSE.
+Gazzang cookbooks are distributed under the Apache 2 Software License. See LICENSE.
 
 
 Bugs
