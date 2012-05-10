@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-case node['platform']
-when "redhat", "centos", "fedora"
+case node['platform_family']
+when "rhel","fedora"
  # use the yum cookbook
  include_recipe "yum::yum"
  # Add the Gazzang gpg key and repo, redhat centos fedora
@@ -33,7 +33,7 @@ when "redhat", "centos", "fedora"
   key "RPM-GPG-KEY-gazzang"
   action :add
  end
-when "ubuntu","debian"
+when "debian"
  # use the apt cookbook
  include_recipe "apt::default"
  # Add the Gazzang gpg key and repoi, ubuntu debian
@@ -45,8 +45,7 @@ when "ubuntu","debian"
   action :add
  end
 else
- # distro not supported/tested, patches welcome
- exit
+  Chef::Application.fatal!("Your distro is not yet supported/tested, patches welcome!")
 end
 
 
@@ -72,10 +71,10 @@ if platform?("centos")
 end
 
 # assemble the packages
-zncrypt_packages = case node['platform']
-when "redhat", "centos", "fedora"
+zncrypt_packages = case node['platform_family']
+when "rhel","fedora"
  %w{kernel-devel kernel-headers dkms ezncryptfs ezncrypt}
-when "ubuntu", "debian"
+when "debian"
  uname = %x(uname -r)
  %W{linux-headers-#{uname} dkms ezncryptfs ezncrypt}
 end
