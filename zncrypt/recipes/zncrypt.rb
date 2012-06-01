@@ -1,4 +1,5 @@
 #
+# Author:: Eddie Garcia (<eddie.garcia@gazzang.com>)
 # Cookbook Name:: zncrypt
 # Recipe:: zncrypt
 #
@@ -17,6 +18,7 @@
 # limitations under the License.
 #
 
+# setup the proper repositories for the distro
 case node['platform_family']
 when "rhel","fedora"
  # use the yum cookbook
@@ -29,7 +31,7 @@ when "rhel","fedora"
  yum_repository "gazzang" do
   repo_name "gazzang"
   description "RHEL $releasever - gazzang.com - base"
-  url "http://archive.gazzang.com/redhat/stable/$releasever/$basearch"
+  url "http://archive.gazzang.com/redhat/stable/$releasever"
   key "RPM-GPG-KEY-gazzang"
   action :add
  end
@@ -73,8 +75,10 @@ end
 # assemble the packages
 zncrypt_packages = case node['platform_family']
 when "rhel","fedora"
+ include_recipe "yum::yum"
  %w{kernel-devel kernel-headers dkms ezncryptfs ezncrypt}
 when "debian"
+ include_recipe "apt::default"
  uname = %x(uname -r)
  %W{linux-headers-#{uname} dkms ezncryptfs ezncrypt}
 end

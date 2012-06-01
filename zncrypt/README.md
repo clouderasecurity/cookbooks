@@ -21,14 +21,21 @@ Cookbooks
 ---------
 
 Requires apt and yum cookbooks to add gpg keys and gazzang repo.
+Requires openssl cookbook to generate a strong passhrase
 
  git clone git://github.com/opscode-cookbooks/apt
  knife cookbook upload apt
 
-
  git clone git://github.com/opscode-cookbooks/yum
  knife cookbook upload yum
 
+ git clone git://github.com/opscode-cookbooks/openssl
+ knife cookbook upload openssl
+
+The cassandra recipe depends on Java, by default is OpenJDK
+
+ git clone git://github.com/opscode-cookbooks/java
+ knife cookbook upload java
 
 Requires a C compiler for Dynamic Kernel Module compilation.
 
@@ -36,13 +43,37 @@ Requires a C compiler for Dynamic Kernel Module compilation.
 Attributes
 ==========
 
+See `attributes/default.rb` for default values
+
+* `node["zncrypt"]["zncrypt_mount"]` - mount point for zncrypt, default `/var/lib/ezncrypt/ezncrypted`.
+* `node["zncrypt"]["zncrypt_storage"]` - directory to store encrypted data, default `/var/lib/ezncrypt/storage`.
 
 Usage
 =====
 
-    include_recipe "zncrypt::zncrypt"
+    include_recipe "zncrypt::default" - installs, configures and activates zncrypt
+    include_recipe "zncrypt::zncrypt" - installs only zncrypt
+    include_recipe "zncrypt::cassandra" -installs cassandra and configures zncrypt
     
 This will install zNcrypt, dkms and the required kernel headers.
+
+Data Bag
+========
+
+Add a databag for each server with a Gazzang license and activation code
+
+  `"data_bag": "license_pool",
+  "name": "data_bag_item_license_pool",
+  "json_class": "Chef::DataBagItem",
+  "chef_type": "data_bag_item",
+  "raw_data": {
+    "passphrase": "yourpassphrase",
+    "id": "cassandra",
+    "activation_code": "NNNNNNNNNNNN",
+    "passphrase2": "yourpassphrase",
+    "license": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+  }`
+
 
 License and Author
 ==================
