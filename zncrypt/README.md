@@ -23,19 +23,19 @@ Cookbooks
 Requires apt and yum cookbooks to add gpg keys and gazzang repo.
 Requires openssl cookbook to generate a strong passhrase
 
- git clone git://github.com/opscode-cookbooks/apt
- knife cookbook upload apt
+ `git clone git://github.com/opscode-cookbooks/apt
+ knife cookbook upload apt`
 
- git clone git://github.com/opscode-cookbooks/yum
- knife cookbook upload yum
+ `git clone git://github.com/opscode-cookbooks/yum
+ knife cookbook upload yum`
 
- git clone git://github.com/opscode-cookbooks/openssl
- knife cookbook upload openssl
+ `git clone git://github.com/opscode-cookbooks/openssl
+ knife cookbook upload openssl`
 
 The cassandra recipe depends on Java, by default is OpenJDK
 
- git clone git://github.com/opscode-cookbooks/java
- knife cookbook upload java
+ `git clone git://github.com/opscode-cookbooks/java
+ knife cookbook upload java`
 
 Requires a C compiler for Dynamic Kernel Module compilation.
 
@@ -62,7 +62,7 @@ Data Bag
 
 Add a databag for each server with a Gazzang license and activation code
 
-  `"data_bag": "license_pool",
+  "data_bag": "license_pool",
   "name": "data_bag_item_license_pool",
   "json_class": "Chef::DataBagItem",
   "chef_type": "data_bag_item",
@@ -72,7 +72,7 @@ Add a databag for each server with a Gazzang license and activation code
     "activation_code": "NNNNNNNNNNNN",
     "passphrase2": "yourpassphrase",
     "license": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-  }`
+  }
 
 
 License and Author
