@@ -105,7 +105,7 @@ end
 # create the ACLs
 passphrase=data_bag_item('license_pool', "#{node.name}")['passphrase']
 passphrase2=data_bag_item('license_pool', "#{node.name}")['passphrase2']
-zncrypt_mount = data_bag_item('zncrypt_config','config')['zncrypt_mount']
+zncrypt_mount = node['zncrypt']['zncrypt_mount']
 script "make a copy of java" do
  interpreter "bash"
  user "root"
