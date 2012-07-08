@@ -54,6 +54,7 @@ Usage
     include_recipe "zncrypt::default" - installs, configures and activates zncrypt
     include_recipe "zncrypt::zncrypt" - installs only zncrypt
     include_recipe "zncrypt::cassandra" -installs cassandra and configures zncrypt
+    include_recipe "zncrypt::mongodb" -installs mongodb and configures zncrypt
     
 This will install zNcrypt, dkms and the required kernel headers.
 
