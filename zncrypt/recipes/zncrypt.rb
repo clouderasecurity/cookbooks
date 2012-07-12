@@ -45,6 +45,7 @@ when "debian"
   components ["main"]
   key "http://archive.gazzang.com/gpg_gazzang.asc"
   action :add
+  notifies :run, resources(:execute => "apt-get update"), :immediately
  end
 else
   Chef::Application.fatal!("Your distro is not yet supported/tested, patches welcome!")

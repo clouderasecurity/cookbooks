@@ -48,6 +48,7 @@ when "debian"
   components ["main"]
   key "http://debian.datastax.com/debian/repo_key"
   action :add
+  notifies :run, resources(:execute => "apt-get update"), :immediately
  end
 else
   Chef::Application.fatal!("Your distro is not yet supported/tested, patches welcome!")
@@ -57,11 +58,9 @@ end
 # assemble the packages
 datastax_packages = case node['platform_family']
 when "rhel","fedora"
-# include_recipe "yum::epel"
  include_recipe "yum::yum"
  %w{apache-cassandra1}
 when "debian"
- include_recipe "apt::default"
  %w{python-cql cassandra}
 end
 

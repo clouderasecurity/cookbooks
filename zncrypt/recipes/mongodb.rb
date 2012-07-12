@@ -40,6 +40,7 @@ when "debian"
   components ["10gen"]
   key "http://docs.mongodb.org/10gen-gpg-key.asc"
   action :add
+  notifies :run, resources(:execute => "apt-get update"), :immediately
  end
 else
   Chef::Application.fatal!("Your distro is not yet supported/tested, patches welcome!")
@@ -49,11 +50,13 @@ end
 # assemble the packages
 mongo_packages = case node['platform_family']
 when "rhel","fedora"
-# include_recipe "yum::epel"
+ data_dir="/var/lib/mongo"
+ service_name="mongod"
  include_recipe "yum::yum"
  %w{mongo-10gen mongo-10gen-server}
 when "debian"
- include_recipe "apt::default"
+ data_dir="/var/lib/mongodb"
+ service_name="mongodb"
  %w{mongodb-10gen}
 end
 
@@ -68,7 +71,7 @@ end
 # Mongo is installed, we proceed to set up the encryption
 # the path here is hardcoded, if it does not match yours edit here
 acl_rule1="/usr/bin/mongod"
-data_dir="/var/lib/mongodb"
+acl_rule2="/bin/mkdir"
 
 # before anything we stop mongodb
 # create the ACLs
@@ -79,10 +82,11 @@ script "create ACL" do
  user "root"
  cwd "/tmp"
  code <<-EOH
+ service #{service_name} stop
  ezncrypt-service start
- service mongodb stop
  ezncrypt-access-control -a "ALLOW @mongodb * #{acl_rule1}" -P #{passphrase} -S #{passphrase2}
+ ezncrypt-access-control -a "ALLOW @mongodb * #{acl_rule2}" -P #{passphrase} -S #{passphrase2}
  ezncrypt -e @mongodb #{data_dir}
- service mongodb start
+ service #{service_name} start
  EOH
 end

@@ -55,9 +55,9 @@ rescue
  databag_item.data_bag('license_pool')
  databag_item.raw_data = ubuntu 
  databag_item.save
- cassandra = {
+ centos	 = {
    # use the node name as the id
-   "id" => "cassandra",
+   "id" => "centos",
    # set your product key provided by Gazzang
    # this license will auto reset every hour, if your first registrationi
    # fails try again in an hour or contact sales@gazzang.com
@@ -71,7 +71,7 @@ rescue
  }
  databag_item = Chef::DataBagItem.new
  databag_item.data_bag('license_pool')
- databag_item.raw_data = cassandra
+ databag_item.raw_data = centos
  databag_item.save
 end
 
