@@ -75,8 +75,8 @@ acl_rule2="/bin/mkdir"
 
 # before anything we stop mongodb
 # create the ACLs
-passphrase=data_bag_item('license_pool', "#{node.name}")['passphrase']
-passphrase2=data_bag_item('license_pool', "#{node.name}")['passphrase2']
+passphrase=data_bag_item('license_pool', 'license1')['passphrase']
+passphrase2=data_bag_item('license_pool', 'license1')['passphrase2']
 script "create ACL" do
  interpreter "bash"
  user "root"

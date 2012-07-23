@@ -22,11 +22,11 @@
 begin
  # check if there is a license pool otherwise skip activation
  data_bag('license_pool')
- license=data_bag_item('license_pool', "#{node.name}")['license']
- activation_code=data_bag_item('license_pool', "#{node.name}")['activation_code']
+ license=data_bag_item('license_pool', 'license1')['license']
+ activation_code=data_bag_item('license_pool', 'license1')['activation_code']
  # we also need a passhprase and second passphrase, we will generate a random one
- passphrase=data_bag_item('license_pool', "#{node.name}")['passphrase']
- passphrase2=data_bag_item('license_pool', "#{node.name}")['passphrase2']
+ passphrase=data_bag_item('license_pool', 'license1')['passphrase']
+ passphrase2=data_bag_item('license_pool', 'license1')['passphrase2']
  # build the arguments to the activate command
  activate_args="--activate --license=#{license} --activation-code=#{activation_code} --passphrase=#{passphrase} --passphrase2=#{passphrase2}"
  script "activate zNcrypt" do

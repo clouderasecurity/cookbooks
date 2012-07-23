@@ -102,8 +102,8 @@ end
 # encrypt it with @securejava container
 # edit the cassandra startup
 # create the ACLs
-passphrase=data_bag_item('license_pool', "#{node.name}")['passphrase']
-passphrase2=data_bag_item('license_pool', "#{node.name}")['passphrase2']
+passphrase=data_bag_item('license_pool', 'license1')['passphrase']
+passphrase2=data_bag_item('license_pool', 'license1')['passphrase2']
 zncrypt_mount = node['zncrypt']['zncrypt_mount']
 script "make a copy of java" do
  interpreter "bash"
