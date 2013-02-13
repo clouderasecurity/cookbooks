@@ -25,13 +25,13 @@ when "rhel","fedora"
  include_recipe "yum::yum"
  # Add the Gazzang gpg key and repo, redhat centos fedora
  yum_key "RPM-GPG-KEY-gazzang" do
-  url "http://archive.gazzang.com/gpg_gazzang.asc"
+  url "https://archive.gazzang.com/gpg_gazzang.asc"
   action :add
  end
  yum_repository "gazzang" do
   repo_name "gazzang"
   description "RHEL $releasever - gazzang.com - base"
-  url "http://archive.gazzang.com/redhat/stable/$releasever"
+  url "https://archive.gazzang.com/redhat/stable/$releasever"
   key "RPM-GPG-KEY-gazzang"
   action :add
  end
@@ -40,10 +40,10 @@ when "debian"
  include_recipe "apt::default"
  # Add the Gazzang gpg key and repoi, ubuntu debian
  apt_repository "gazzang" do
-  uri "http://archive.gazzang.com/#{node['platform']}/stable"
+  uri "https://archive.gazzang.com/#{node['platform']}/stable"
   distribution node['lsb']['codename']
   components ["main"]
-  key "http://archive.gazzang.com/gpg_gazzang.asc"
+  key "https://archive.gazzang.com/gpg_gazzang.asc"
   action :add
   notifies :run, resources(:execute => "apt-get update"), :immediately
  end
@@ -77,11 +77,11 @@ end
 zncrypt_packages = case node['platform_family']
 when "rhel","fedora"
  include_recipe "yum::yum"
- %w{kernel-devel kernel-headers dkms ezncryptfs ezncrypt}
+ %w{kernel-devel kernel-headers dkms zncrypt}
 when "debian"
  include_recipe "apt::default"
  uname = %x(uname -r)
- %W{linux-headers-#{uname} dkms ezncryptfs ezncrypt}
+ %W{linux-headers-#{uname} dkms zncrypt}
 end
 
 # loop to install packages

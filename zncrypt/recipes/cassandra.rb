@@ -102,27 +102,26 @@ end
 # encrypt it with @securejava container
 # edit the cassandra startup
 # create the ACLs
-passphrase=data_bag_item('license_pool', 'license1')['passphrase']
-passphrase2=data_bag_item('license_pool', 'license1')['passphrase2']
+passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
+passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
 zncrypt_mount = node['zncrypt']['zncrypt_mount']
 script "make a copy of java" do
  interpreter "bash"
  user "root"
  cwd "/tmp"
  code <<-EOH
- ezncrypt-service start
  service cassandra stop
  cp -rp #{java_dir} #{secjava_dir}
- ezncrypt --encrypt @securejava #{secjava_dir}
+ zncrypt-move encrypt @securejava #{secjava_dir} /mnt/zncrypt
  sed -i '#{startup_edit}' /etc/init.d/cassandra
- ezncrypt-access-control -a "ALLOW @securejava * #{acl_rule1}" -P #{passphrase} -S #{passphrase2}
- ezncrypt-access-control -a "ALLOW @securejava * #{acl_rule2}" -P #{passphrase} -S #{passphrase2}
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt acl --add --rule="ALLOW @securejava * #{acl_rule1}"
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt acl --add --rule="ALLOW @securejava * #{acl_rule2}"
+ zncrypt-move encrypt @cassandra /var/lib/cassandra /mnt/zncrypt
  ezncrypt -e @cassandra /var/lib/cassandra
- ezncrypt-load-key -P #{passphrase} -S #{passphrase2} 
- ezncrypt-access-control -a "ALLOW @cassandra * #{zncrypt_mount}/securejava#{secjava}" -P #{passphrase} -S #{passphrase2} 
- ezncrypt-load-key -P #{passphrase} -S #{passphrase2} 
- ezncrypt-access-control -a "ALLOW @securejava * #{zncrypt_mount}/securejava#{secjava}" -P #{passphrase} -S #{passphrase2} 
- keyctl clear @u
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt set --mode=admin
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt acl --add --rule="ALLOW @cassandra * #{zncrypt_mount}/securejava#{secjava}"
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt acl --add --rule="ALLOW @securejava * #{zncrypt_mount}/securejava#{secjava}"
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt set --mode=enforcing
  service cassandra start
  EOH
 end

@@ -18,23 +18,24 @@
 # limitations under the License.
 #
 
-# activate zncrypt, for that we need a license, activation code provided by Gazzang
+# activate zncrypt, for that we need a master key and license administrator's email
 begin
- # check if there is a license pool otherwise skip activation
- data_bag('license_pool')
- license=data_bag_item('license_pool', 'license1')['license']
- activation_code=data_bag_item('license_pool', 'license1')['activation_code']
+ # check if there is a masterkey_bag otherwise skip activation
+ data_bag('masterkey_bag')
  # we also need a passhprase and second passphrase, we will generate a random one
- passphrase=data_bag_item('license_pool', 'license1')['passphrase']
- passphrase2=data_bag_item('license_pool', 'license1')['passphrase2']
+ passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
+ passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
+ # grab license key administrator's email from attributes
+ admin_email = node['zncrypt']['zncrypt_admin_email']
  # build the arguments to the activate command
- activate_args="--activate --license=#{license} --activation-code=#{activation_code} --passphrase=#{passphrase} --passphrase2=#{passphrase2}"
+ activate_args="--key-type=dual-passphrase"
  script "activate zNcrypt" do
   interpreter "bash"
   user "root"
   code <<-EOH
-  mkdir /var/log/ezncrypt
-  ezncrypt-activate #{activate_args}
+  # use printf to avoid logging of the passphrase
+  printf "#{passphrase}\n#{passphrase}\n#{passphrase2}\n#{passphrase2}" | zncrypt register #{activate_args}
+  printf "#{passphrase}\n#{passphrase2}\n" | zncrypt request-activation --contact=#{admin_email}
   EOH
  end
 rescue

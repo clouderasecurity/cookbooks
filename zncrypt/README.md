@@ -1,7 +1,7 @@
 Description
 ===========
 
-Installs zNcrypt and prerequistes
+Installs zNcrypt 3.x and prerequistes
 
 Requirements
 ============
@@ -14,7 +14,7 @@ Platform
 
 Tested on:
 
-* Ubuntu 10.04, 11.10
+* Ubuntu 10.04, 12.04
 * CentOS 6.2
 
 Cookbooks
@@ -47,6 +47,7 @@ See `attributes/default.rb` for default values
 
 * `node["zncrypt"]["zncrypt_mount"]` - mount point for zncrypt, default `/var/lib/ezncrypt/ezncrypted`.
 * `node["zncrypt"]["zncrypt_storage"]` - directory to store encrypted data, default `/var/lib/ezncrypt/storage`.
+* `node["zncrypt"]["zncrypt_admin_email"]` - email address of zNcrypt license key Administrator`.
 
 Usage
 =====
@@ -56,23 +57,21 @@ Usage
     include_recipe "zncrypt::cassandra" -installs cassandra and configures zncrypt
     include_recipe "zncrypt::mongodb" -installs mongodb and configures zncrypt
     
-This will install zNcrypt, dkms and the required kernel headers.
+This will install zNcrypt 3.x, dkms and the required kernel headers.
 
 Data Bag
 ========
 
 Add a databag for each server with a Gazzang license and activation code
 
-  "data_bag": "license_pool",
-  "name": "data_bag_item_license_pool",
+  "data_bag": "masterkey_bag",
+  "name": "masterkey_bag",
   "json_class": "Chef::DataBagItem",
   "chef_type": "data_bag_item",
   "raw_data": {
+    "id": "key1",
     "passphrase": "yourpassphrase",
-    "id": "cassandra",
-    "activation_code": "NNNNNNNNNNNN",
     "passphrase2": "yourpassphrase",
-    "license": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
   }
 
 

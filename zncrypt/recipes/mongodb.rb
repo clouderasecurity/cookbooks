@@ -75,18 +75,18 @@ acl_rule2="/bin/mkdir"
 
 # before anything we stop mongodb
 # create the ACLs
-passphrase=data_bag_item('license_pool', 'license1')['passphrase']
-passphrase2=data_bag_item('license_pool', 'license1')['passphrase2']
+passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
+passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
+zncrypt_mount = node['zncrypt']['zncrypt_mount']
 script "create ACL" do
  interpreter "bash"
  user "root"
  cwd "/tmp"
  code <<-EOH
  service #{service_name} stop
- ezncrypt-service start
- ezncrypt-access-control -a "ALLOW @mongodb * #{acl_rule1}" -P #{passphrase} -S #{passphrase2}
- ezncrypt-access-control -a "ALLOW @mongodb * #{acl_rule2}" -P #{passphrase} -S #{passphrase2}
- ezncrypt -e @mongodb #{data_dir}
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt acl --add --rule="ALLOW @mongodb * #{acl_rule1}"
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt acl --add --rule="ALLOW @mongodb * #{acl_rule2}"
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt-move encrypt @mongodb #{data_dir} #{zncrypt_mount}
  service #{service_name} start
  EOH
 end

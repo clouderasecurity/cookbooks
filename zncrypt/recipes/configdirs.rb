@@ -21,19 +21,17 @@
 # pull the directory configuration from the data bags
 zncrypt_mount = node['zncrypt']['zncrypt_mount']
 zncrypt_storage = node['zncrypt']['zncrypt_storage']
-config_dirs = "-m #{zncrypt_mount} -s #{zncrypt_storage }"
-case node['platform_family']
-when "rhel","fedora"
- opt = '-l'
-when "debian"
- opt = '-a'
-end
-
+# check if there is a masterkey_bag otherwise skip configdirs
+data_bag('masterkey_bag')
+# we also need a passhprase and second passphrase, we will generate a random one
+passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
+passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
 script "config dirs" do
  interpreter "bash"
  user "root"
  code <<-EOH
- ezncrypt-service stop
- ezncrypt-configure-directories #{config_dirs} #{opt}
+ mkdir -p #{zncrypt_storage}
+ mkdir -p #{zncrypt_mount}
+ printf "#{passphrase}\n#{passphrase2}\n" | zncrypt-prepare #{zncrypt_storage} #{zncrypt_mount}
  EOH
 end

@@ -24,3 +24,5 @@
 default['zncrypt']['zncrypt_mount'] = '/var/lib/ezncrypt/ezncrypted'
 # setup the storage directory for zncrypt
 default['zncrypt']['zncrypt_storage'] = '/var/lib/ezncrypt/storage'
+# setup the email for the license key for administrator to approve, you will need to change this when you purchase zNcrypt
+default['zncrypt']['zncrypt_admin_email'] = 'eddie.garcia@gazzang.com'
