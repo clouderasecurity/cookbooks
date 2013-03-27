@@ -25,6 +25,9 @@
 # the example logic below would need to be added to your own recipe
 
 # check if the data bag exists, use a begin / rescue to handle the exception
+passphrase = node['zncrypt']['passphrase']
+passphrase2 = node['zncrypt']['passphrase2']
+if passphrase.nil?
 begin
  # check if there is a masterkey_bag already and skip creating
  data_bag('masterkey_bag')
@@ -48,6 +51,7 @@ rescue
  databag_item.data_bag('masterkey_bag')
  databag_item.raw_data = key1 
  databag_item.save
+end
 end
 
 # installs zncrypt

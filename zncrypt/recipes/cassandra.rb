@@ -6,6 +6,7 @@
 # Copyright 2012, Gazzang, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
+#begin
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -102,8 +103,15 @@ end
 # encrypt it with @securejava container
 # edit the cassandra startup
 # create the ACLs
-passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
-passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
+passphrase = node['zncrypt']['passphrase']
+passphrase2 = node['zncrypt']['passphrase2']
+if passphrase.nil?
+ # check if there is a masterkey_bag otherwise skip activation
+ data_bag('masterkey_bag')
+ # we also need a passhprase and second passphrase, we will generate a random one
+ passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
+ passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
+end
 zncrypt_mount = node['zncrypt']['zncrypt_mount']
 script "make a copy of java" do
  interpreter "bash"

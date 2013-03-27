@@ -19,12 +19,16 @@
 #
 
 # activate zncrypt, for that we need a master key and license administrator's email
-begin
+passphrase = node['zncrypt']['passphrase']
+passphrase2 = node['zncrypt']['passphrase2']
+if passphrase.nil? 
  # check if there is a masterkey_bag otherwise skip activation
  data_bag('masterkey_bag')
  # we also need a passhprase and second passphrase, we will generate a random one
  passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
  passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
+end
+unless passphrase.nil?
  # grab license key administrator's email from attributes
  admin_email = node['zncrypt']['zncrypt_admin_email']
  # build the arguments to the activate command
@@ -38,6 +42,4 @@ begin
   printf "#{passphrase}\n#{passphrase2}\n" | zncrypt request-activation --contact=#{admin_email}
   EOH
  end
-rescue
- #  Skip the activation
 end

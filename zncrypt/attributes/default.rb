@@ -26,3 +26,9 @@ default['zncrypt']['zncrypt_mount'] = '/var/lib/ezncrypt/ezncrypted'
 default['zncrypt']['zncrypt_storage'] = '/var/lib/ezncrypt/storage'
 # setup the email for the license key for administrator to approve, you will need to change this when you purchase zNcrypt
 default['zncrypt']['zncrypt_admin_email'] = 'eddie.garcia@gazzang.com'
+# optionally setup a passphrase and passphrase2
+# when used as an attribute this will override the passphrase databag, useful when databags are not supported
+# NOTE: passphrase must be between 15 and 32 characters.
+#default['zncrypt']['passphrase'] = 'pleasechangeme1'
+#default['zncrypt']['passphrase2'] = 'pleasechangeme1'
+
