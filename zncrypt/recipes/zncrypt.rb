@@ -80,7 +80,7 @@ when "rhel","fedora"
  %w{kernel-devel kernel-headers dkms zncrypt}
 when "debian"
  include_recipe "apt::default"
- uname = %x(uname -r)
+ uname = %x(uname -r).chomp
  %W{linux-headers-#{uname} dkms zncrypt}
 end
 
