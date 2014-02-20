@@ -1,7 +1,7 @@
 Description
 ===========
 
-Installs zNcrypt 3.x and prerequistes
+Installs zNcrypt 3 and all prerequistes.
 
 Requirements
 ============
@@ -9,36 +9,34 @@ Requirements
 Platform
 --------
 
-* Debian, Ubuntu
-* CentOS, Red Hat, Fedora
+* Ubuntu 12.04+
+* CentOS, RedHat Enterprise Linux 6+
 
 Tested on:
 
 * Ubuntu 12.04
-* CentOS 6.2
+* CentOS 6.4
 
 Cookbooks
 ---------
 
-Requires apt and yum cookbooks to add gpg keys and gazzang repo.
-Requires openssl cookbook to generate a strong passhrase
+The `apt` and `yum` (version < 2.4.4) cookbooks are required to configure the system package manager as well as add the necessary GPG signing keys. The `openssl` cookbook is also recommended if you will be utilizing the auto-generated password functionality.
 
- `git clone git://github.com/opscode-cookbooks/apt
- knife cookbook upload apt`
+To install each cookbook:
 
- `git clone git://github.com/opscode-cookbooks/yum
- knife cookbook upload yum`
+ `knife cookbook site install apt`
+ 
+ `knife cookbook site install yum 2.4.4`
+ 
+ `knife cookbook site install openssl`
 
- `git clone git://github.com/opscode-cookbooks/openssl
- knife cookbook upload openssl`
+Then upload them to your chef server:
 
-The cassandra recipe depends on Java, by default is OpenJDK
+ `knife cookbook upload --all`
 
- `git clone git://github.com/opscode-cookbooks/java
- knife cookbook upload java`
+The `zncrypt::cassandra` recipe depends on Java, by default this is the OpenJDK version. This can be installed with:
 
-Requires a C compiler for Dynamic Kernel Module compilation.
-
+ `knife cookbook site install java`
 
 Attributes
 ==========
@@ -56,17 +54,17 @@ See `attributes/default.rb` for default values:
 Usage
 =====
 
-    include_recipe "zncrypt::default" - installs, configures and activates zncrypt
-    include_recipe "zncrypt::zncrypt" - installs only zncrypt
-    include_recipe "zncrypt::cassandra" -installs cassandra and configures zncrypt
-    include_recipe "zncrypt::mongodb" -installs mongodb and configures zncrypt
+    include_recipe "zncrypt::default" - installs, configures, and activates zNcrypt
+    include_recipe "zncrypt::install" - only installs zNcrypt, no configuration
+    include_recipe "zncrypt::cassandra" - installs Cassandra and configures zNcrypt
+    include_recipe "zncrypt::mongodb" -installs MongoDB and configures zNcrypt
     
-This will install zNcrypt 3.x, dkms and the required kernel headers.
+All of the above commands will install zNcrypt 3 and its dependencies.
 
 Data Bag
 ========
 
-Add a databag for each server with a Gazzang license:
+Add a databag for each server where zNcrypt is active:
 
   "data_bag": "masterkey_bag",
   "name": "masterkey_bag",
