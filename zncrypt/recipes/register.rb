@@ -20,26 +20,25 @@
 
 # activate zncrypt, for that we need a master key and license administrator's email
 passphrase = node['zncrypt']['passphrase']
-passphrase2 = node['zncrypt']['passphrase2']
 if passphrase.nil? 
  # check if there is a masterkey_bag otherwise skip activation
  data_bag('masterkey_bag')
  # we also need a passhprase and second passphrase, we will generate a random one
- passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
- passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
+ passphrase = data_bag_item('masterkey_bag', 'encryption_key')['passphrase']
 end
 unless passphrase.nil?
  # grab license key administrator's email from attributes
- admin_email = node['zncrypt']['zncrypt_admin_email']
+ org = node['zncrypt']['zncrypt_org']
+ auth = node['zncrypt']['zncrypt_auth']
+ server = node['zncrypt']['zncrypt_keyserver']
  # build the arguments to the activate command
- activate_args="--key-type=dual-passphrase"
- script "activate zNcrypt" do
+ activate_args="-s #{server} -o #{org} --auth=#{auth} --key-type=single-passphrase"
+ script "Register and activate zNcrypt" do
   interpreter "bash"
   user "root"
   code <<-EOH
   # use printf to avoid logging of the passphrase
-  printf "#{passphrase}\n#{passphrase}\n#{passphrase2}\n#{passphrase2}" | zncrypt register #{activate_args}
-  printf "#{passphrase}\n#{passphrase2}\n" | zncrypt request-activation --contact=#{admin_email}
+  printf "#{passphrase}\n#{passphrase}" | zncrypt register #{activate_args}
   EOH
  end
 end
