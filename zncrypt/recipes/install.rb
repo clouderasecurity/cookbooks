@@ -22,7 +22,7 @@
 case node['platform_family']
 when "rhel","fedora"
  # use the yum cookbook
- include_recipe "yum::yum"
+ include_recipe "yum::default"
  # Add the Gazzang gpg key and repo, redhat centos fedora
  yum_key "RPM-GPG-KEY-gazzang" do
   url "https://archive.gazzang.com/gpg_gazzang.asc"
@@ -51,37 +51,15 @@ else
   Chef::Application.fatal!("Your distro is not yet supported/tested, patches welcome!")
 end
 
-
-# zNcrypt requires dkms to dynamically compile the zNcrypt kernel nodule
-# in most distributions the package is included in the repo
-# on CentOS it may need to be preinstalled, we will use RPM forge
-if platform?("centos")
- # use the yum cookbook to add the RPM-GPG-KEY
- yum_key "RPM-GPG-KEY.dag.txt" do
-  url "http://apt.sw.be/RPM-GPG-KEY.dag.txt"
-  action :add
- end
- # there may be a better way to install using yum_repository,  but this works
- script "install dkms rpm for CentOS" do
-  interpreter "bash"
-  user "root"
-  cwd "/usr/local/src"
-  code <<-EOH
-  wget http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm
-  rpm -ivh --force rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm
-  EOH
- end
-end
-
 # assemble the packages
 zncrypt_packages = case node['platform_family']
 when "rhel","fedora"
- include_recipe "yum::yum"
- %w{kernel-devel kernel-headers dkms zncrypt}
+ include_recipe "yum::default"
+ %w{kernel-devel kernel-headers dkms haveged zncrypt}
 when "debian"
  include_recipe "apt::default"
  uname = %x(uname -r)
- %W{linux-headers-#{uname} dkms zncrypt}
+ %W{linux-headers-#{uname} dkms make perl haveged zncrypt}
 end
 
 # loop to install packages
@@ -91,3 +69,11 @@ zncrypt_packages.each do |zncrypt_pack|
   end
 end
 
+# start haveged to decrease registration time
+script "Starting haveged for secure entropy generation." do
+ interpreter "bash"
+ user "root"
+ code <<-EOH
+ /etc/init.d/haveged start
+ EOH
+end

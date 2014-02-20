@@ -14,7 +14,7 @@ Platform
 
 Tested on:
 
-* Ubuntu 10.04, 12.04
+* Ubuntu 12.04
 * CentOS 6.2
 
 Cookbooks
@@ -43,11 +43,15 @@ Requires a C compiler for Dynamic Kernel Module compilation.
 Attributes
 ==========
 
-See `attributes/default.rb` for default values
+See `attributes/default.rb` for default values:
 
-* `node["zncrypt"]["zncrypt_mount"]` - mount point for zncrypt, default `/var/lib/ezncrypt/ezncrypted`.
-* `node["zncrypt"]["zncrypt_storage"]` - directory to store encrypted data, default `/var/lib/ezncrypt/storage`.
-* `node["zncrypt"]["zncrypt_admin_email"]` - email address of zNcrypt license key Administrator`.
+* `default["zncrypt"]["zncrypt_keyserver"]` - Hostname of keyserver to register client against.
+* `default["zncrypt"]["zncrypt_org"]` - Organization to register zNcrypt client against (provided by Gazzang).
+* `default["zncrypt"]["zncrypt_auth"]` - Authorization code tied to organization above (provided by Gazzang).
+* `default["zncrypt"]["zncrypt_mount"]` - Location to mount encrypted file system. Note: No data will be stored at this location, only accessed.
+* `default["zncrypt"]["zncrypt_storage"]` - Location to store encrypted data. Note: All data encrypted will be stored in this location (and accessed through the mount point).
+* `default["zncrypt"]["passphrase"]` - Master password used to configure zNcrypt. This password will be used to alter any and all zNcrypt configuration. Alternatively, this can be commented out and a passphrase will be generated for you and stored in the databag tied to this instance.
+
 
 Usage
 =====
@@ -62,16 +66,15 @@ This will install zNcrypt 3.x, dkms and the required kernel headers.
 Data Bag
 ========
 
-Add a databag for each server with a Gazzang license and activation code
+Add a databag for each server with a Gazzang license:
 
   "data_bag": "masterkey_bag",
   "name": "masterkey_bag",
   "json_class": "Chef::DataBagItem",
   "chef_type": "data_bag_item",
   "raw_data": {
-    "id": "key1",
+    "id": "key",
     "passphrase": "yourpassphrase",
-    "passphrase2": "yourpassphrase",
   }
 
 
@@ -80,7 +83,7 @@ License and Author
 
 Author:: Eddie Garcia (<eddie.garcia@gazzang.com>)
 
-Copyright:: 2012 Gazzang, Inc
+Copyright:: 2014 Gazzang, Inc
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

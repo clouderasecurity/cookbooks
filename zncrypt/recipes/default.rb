@@ -26,7 +26,6 @@
 
 # check if the data bag exists, use a begin / rescue to handle the exception
 passphrase = node['zncrypt']['passphrase']
-passphrase2 = node['zncrypt']['passphrase2']
 if passphrase.nil?
 begin
  # check if there is a masterkey_bag already and skip creating
@@ -41,11 +40,9 @@ rescue
  masterkey_bag.save
  # create json for data bag item for each node
  key1 = {	
-   "id" => "key1", 
+   "id" => "encryption_key", 
    # random passphrase
    "passphrase" => secure_password,
-   # random passphrase
-   "passphrase2" => secure_password,
  }
  databag_item = Chef::DataBagItem.new
  databag_item.data_bag('masterkey_bag')
@@ -55,8 +52,8 @@ end
 end
 
 # installs zncrypt
-include_recipe "zncrypt::zncrypt"
+include_recipe "zncrypt::install"
 # activates the zncrypt and stores the master key using the data bag 
-include_recipe "zncrypt::activate"
+include_recipe "zncrypt::register"
 # configures the directories using the configuration from the databag
 include_recipe "zncrypt::configdirs"

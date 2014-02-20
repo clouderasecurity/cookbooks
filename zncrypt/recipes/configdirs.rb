@@ -22,20 +22,18 @@
 zncrypt_mount = node['zncrypt']['zncrypt_mount']
 zncrypt_storage = node['zncrypt']['zncrypt_storage']
 passphrase = node['zncrypt']['passphrase']
-passphrase2 = node['zncrypt']['passphrase2']
 if passphrase.nil?
  # check if there is a masterkey_bag otherwise skip activation
  data_bag('masterkey_bag')
  # we also need a passhprase and second passphrase, we will generate a random one
  passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
- passphrase2=data_bag_item('masterkey_bag', 'key1')['passphrase2']
 end
-script "config dirs" do
+script "Configure directories to store encrypted data" do
  interpreter "bash"
  user "root"
  code <<-EOH
  mkdir -p #{zncrypt_storage}
  mkdir -p #{zncrypt_mount}
- printf "#{passphrase}\n#{passphrase2}\n" | zncrypt-prepare #{zncrypt_storage} #{zncrypt_mount}
+ printf "#{passphrase}\n" | zncrypt-prepare #{zncrypt_storage} #{zncrypt_mount}
  EOH
 end
