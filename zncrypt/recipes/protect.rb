@@ -1,7 +1,7 @@
 #
 # Author:: Eddie Garcia (<eddie.garcia@gazzang.com>)
 # Cookbook Name:: zncrypt
-# Recipe:: register
+# Recipe:: protect
 #
 # Copyright 2012, Gazzang, Inc.
 #
@@ -18,26 +18,25 @@
 # limitations under the License.
 #
 
+# pull the directory configuration from the data bags
+acl = node['zncrypt']['acl_name']
+binaries = node['zncrypt']['acl_binaries']
+
 passphrase = node['zncrypt']['passphrase']
-if passphrase.nil? 
+if passphrase.nil?
     data_bag('masterkey_bag')
-    passphrase = data_bag_item('masterkey_bag', 'encryption_key')['passphrase']
+    passphrase=data_bag_item('masterkey_bag', 'encryption_key')['passphrase']
 end
 
 unless passphrase.nil?
-    org = node['zncrypt']['zncrypt_org']
-    auth = node['zncrypt']['zncrypt_auth']
-    server = node['zncrypt']['zncrypt_keyserver']
-    # build the arguments to the activate command
-    activate_args="-s #{server} -o #{org} --auth=#{auth} --key-type=single-passphrase"
-    script "Register zNcrypt with zTrustee Key Management Server" do
-        interpreter "bash"
-        user "root"
-        code <<-EOH
-        printf "#{passphrase}\n#{passphrase}" | zncrypt register #{activate_args}
-        EOH
-        not_if do
-          File.exists?("/etc/zncrypt/ztrustee/clientname")
+    binaries.each do |b|
+        script "Set ACL rule for: #{b}" do
+            interpreter "bash"
+            user "root"
+            code <<-EOH
+            # ignore errors
+            printf "#{passphrase}\n" | zncrypt acl --add --rule="ALLOW @#{acl} * #{b}"; true
+            EOH
         end
     end
 end

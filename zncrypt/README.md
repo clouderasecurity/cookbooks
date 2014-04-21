@@ -1,3 +1,4 @@
+
 Description
 ===========
 
@@ -34,10 +35,6 @@ Then upload them to your chef server:
 
  `knife cookbook upload --all`
 
-The `zncrypt::cassandra` recipe depends on Java, by default this is the OpenJDK version. This can be installed with:
-
- `knife cookbook site install java`
-
 Attributes
 ==========
 
@@ -48,16 +45,17 @@ See `attributes/default.rb` for default values:
 * `default["zncrypt"]["zncrypt_auth"]` - Authorization code tied to organization above (provided by Gazzang).
 * `default["zncrypt"]["zncrypt_mount"]` - Location to mount encrypted file system. Note: No data will be stored at this location, only accessed.
 * `default["zncrypt"]["zncrypt_storage"]` - Location to store encrypted data. Note: All data encrypted will be stored in this location (and accessed through the mount point).
+* `default['zncrypt']['to_encrypt']` - Array of objects to encrypt (ex: ['/etc/issue'], etc.)
+* `default['zncrypt']['acl_name']` - Category name to assign to binaries below (ex: mysql, mongo, etc.)
+* `default['zncrypt']['acl_binaries']` - Binaries to create ACL rules for. zNcrypt provisions access based on process, so these processes will have access to the encrypted data set (`to_encrypt`).
 * `default["zncrypt"]["passphrase"]` - Master password used to configure zNcrypt. This password will be used to alter any and all zNcrypt configuration. Alternatively, this can be commented out and a passphrase will be generated for you and stored in the databag tied to this instance.
 
 
 Usage
 =====
 
-    include_recipe "zncrypt::default" - installs, configures, and activates zNcrypt
+    include_recipe "zncrypt::default" - installs, registers, and configures zNcrypt client based on attributes
     include_recipe "zncrypt::install" - only installs zNcrypt, no configuration
-    include_recipe "zncrypt::cassandra" - installs Cassandra and configures zNcrypt
-    include_recipe "zncrypt::mongodb" -installs MongoDB and configures zNcrypt
     
 All of the above commands will install zNcrypt 3 and its dependencies.
 

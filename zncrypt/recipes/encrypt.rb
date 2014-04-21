@@ -1,7 +1,7 @@
 #
 # Author:: Eddie Garcia (<eddie.garcia@gazzang.com>)
 # Cookbook Name:: zncrypt
-# Recipe:: configdirs
+# Recipe:: encrypt
 #
 # Copyright 2012, Gazzang, Inc.
 #
@@ -19,21 +19,25 @@
 #
 
 # pull the directory configuration from the data bags
-zncrypt_mount = node['zncrypt']['zncrypt_mount']
-zncrypt_storage = node['zncrypt']['zncrypt_storage']
+mount = node['zncrypt']['zncrypt_mount']
+acl = node['zncrypt']['acl_name']
+targets = node['zncrypt']['to_encrypt']
+
 passphrase = node['zncrypt']['passphrase']
 if passphrase.nil?
- # check if there is a masterkey_bag otherwise skip activation
- data_bag('masterkey_bag')
- # we also need a passhprase and second passphrase, we will generate a random one
- passphrase=data_bag_item('masterkey_bag', 'key1')['passphrase']
+    data_bag('masterkey_bag')
+    passphrase=data_bag_item('masterkey_bag', 'encryption_key')['passphrase']
 end
-script "Configure directories to store encrypted data" do
- interpreter "bash"
- user "root"
- code <<-EOH
- mkdir -p #{zncrypt_storage}
- mkdir -p #{zncrypt_mount}
- printf "#{passphrase}\n" | zncrypt-prepare #{zncrypt_storage} #{zncrypt_mount}
- EOH
+
+unless passphrase.nil?
+    targets.each do |t|
+        script "Encrypt target: #{t}" do
+            interpreter "bash"
+            user "root"
+            code <<-EOH
+            printf "#{passphrase}\n" | zncrypt-move encrypt @#{acl} #{t} #{mount}
+            EOH
+            not_if "test -L #{t}"
+        end
+    end
 end
