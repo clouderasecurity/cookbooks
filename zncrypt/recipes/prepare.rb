@@ -1,7 +1,7 @@
 #
 # Author:: Eddie Garcia (<eddie.garcia@gazzang.com>)
 # Cookbook Name:: zncrypt
-# Recipe:: register
+# Recipe:: prepare
 #
 # Copyright 2012, Gazzang, Inc.
 #
@@ -18,26 +18,31 @@
 # limitations under the License.
 #
 
+# pull the directory configuration from the data bags
+zncrypt_mount = node['zncrypt']['zncrypt_mount']
+zncrypt_storage = node['zncrypt']['zncrypt_storage']
 passphrase = node['zncrypt']['passphrase']
-if passphrase.nil? 
+if passphrase.nil?
     data_bag('masterkey_bag')
-    passphrase = data_bag_item('masterkey_bag', 'encryption_key')['passphrase']
+    passphrase=data_bag_item('masterkey_bag', 'encryption_key')['passphrase']
 end
 
 unless passphrase.nil?
-    org = node['zncrypt']['zncrypt_org']
-    auth = node['zncrypt']['zncrypt_auth']
-    server = node['zncrypt']['zncrypt_keyserver']
-    # build the arguments to the activate command
-    activate_args="-s #{server} -o #{org} --auth=#{auth} --key-type=single-passphrase"
-    script "Register zNcrypt with zTrustee Key Management Server" do
+    script "Verify status of zNcrypt kernel module." do
         interpreter "bash"
         user "root"
         code <<-EOH
-        printf "#{passphrase}\n#{passphrase}" | zncrypt register #{activate_args}
+        test -f /var/lib/dkms/zncryptfs/3*/$(uname -r)*/$(uname -i)/module/*.ko || zncrypt-module-setup
         EOH
-        not_if do
-          File.exists?("/etc/zncrypt/ztrustee/clientname")
-        end
+    end
+    script "Prepare system for encryption." do
+        interpreter "bash"
+        user "root"
+        code <<-EOH
+        mkdir -p #{zncrypt_storage}
+        mkdir -p #{zncrypt_mount}
+        printf "#{passphrase}\n" | zncrypt-prepare #{zncrypt_storage} #{zncrypt_mount}
+        EOH
+        not_if "grep #{zncrypt_storage} /etc/zncrypt/ztab"
     end
 end

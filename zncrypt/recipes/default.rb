@@ -27,28 +27,27 @@
 # check if the data bag exists, use a begin / rescue to handle the exception
 passphrase = node['zncrypt']['passphrase']
 if passphrase.nil?
-begin
- # check if there is a masterkey_bag already and skip creating
- data_bag('masterkey_bag')
-rescue
- #include the secure password from openssl recipe
- ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
+    begin
+        # check if there is a masterkey_bag already and skip creating
+        data_bag('masterkey_bag')
+    rescue
+        #include the secure password from openssl recipe
+        ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
- # create a data bag for licensing pool
- masterkey_bag = Chef::DataBag.new
- masterkey_bag.name('masterkey_bag')
- masterkey_bag.save
- # create json for data bag item for each node
- key1 = {	
-   "id" => "encryption_key", 
-   # random passphrase
-   "passphrase" => secure_password,
- }
- databag_item = Chef::DataBagItem.new
- databag_item.data_bag('masterkey_bag')
- databag_item.raw_data = key1 
- databag_item.save
-end
+        # create a data bag for licensing pool
+        masterkey_bag = Chef::DataBag.new
+        masterkey_bag.name('masterkey_bag')
+        masterkey_bag.save
+        # create json for data bag item for each node
+        key = {	
+            "id" => "encryption_key", 
+            "passphrase" => secure_password,
+        }
+        databag_item = Chef::DataBagItem.new
+        databag_item.data_bag('masterkey_bag')
+        databag_item.raw_data = key
+        databag_item.save
+    end
 end
 
 # installs zncrypt
@@ -56,4 +55,8 @@ include_recipe "zncrypt::install"
 # activates the zncrypt and stores the master key using the data bag 
 include_recipe "zncrypt::register"
 # configures the directories using the configuration from the databag
-include_recipe "zncrypt::configdirs"
+include_recipe "zncrypt::prepare"
+# configure the ACL's, to appropriately provision access to the encrypted data
+include_recipe "zncrypt::protect"
+# encrypt the target directories
+include_recipe "zncrypt::encrypt"
