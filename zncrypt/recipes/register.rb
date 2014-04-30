@@ -30,6 +30,9 @@ unless passphrase.nil?
     server = node['zncrypt']['zncrypt_keyserver']
     # build the arguments to the activate command
     activate_args="-s #{server} -o #{org} --auth=#{auth} --key-type=single-passphrase"
+    if node['zncrypt']['skip_ssl']
+        activate_args = activate_args + " --skip-ssl-check"
+    end
     script "Register zNcrypt with zTrustee Key Management Server" do
         interpreter "bash"
         user "root"

@@ -55,3 +55,5 @@ default['zncrypt']['acl_binaries'] = [ '/bin/cat', '/usr/bin/tail' ]
 #
 default['zncrypt']['passphrase'] = 'changethisthingplease'
 
+# Whether to enforce SSL hostname checking (leave false, unless you know what you're doing)
+default['zncrypt']['skip_ssl'] = true
